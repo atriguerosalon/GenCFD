@@ -156,7 +156,12 @@ def run(
                 gen_samples = stats_recorder.gen_samples.cpu().numpy(),
                 gt_samples = stats_recorder.gt_samples.cpu().numpy()
             )
-            if stats_recorder.compute_cfd_metrics:
+            # TODO: compute_cfd_metrics, epsilon_gen/gt, spectrum_gen/gt are never set in
+            # StatsRecorder and never computed during evaluation — this feature appears
+            # incomplete in the upstream codebase. Using getattr to safely skip for now.
+            # Check with paper authors whether spectral stats were intentionally removed
+            # or are missing from this release.
+            if getattr(stats_recorder, 'compute_cfd_metrics', False):
                 np.savez(
                     os.path.join(save_dir,"spectral_stats.npz"), 
                     epsilon_gen=stats_recorder.epsilon_gen.cpu().numpy(),
